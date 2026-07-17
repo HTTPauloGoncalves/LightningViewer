@@ -126,8 +126,6 @@ public class EumetSatIngestorWorker : BackgroundService
             {
                 _logger.LogInformation("⬇️ BAIXANDO ARQUIVO DO PASSADO: {id}", product.Id);
                 var data = await _apiClient.DownloadProductAsync(product.DownloadUrl, ct);
-                
-                await System.IO.File.WriteAllBytesAsync(@"D:\PLANB\LightningViewer\debug.nc", data);
 
                 _logger.LogDebug("Parsing NetCDF-4 file ({kb} KB)", data.Length / 1024);
                 var flashes = NetCdfParser.Parse(data, product.Id, product.SensingTime).ToList();
