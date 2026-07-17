@@ -64,3 +64,19 @@ docker compose down
 O banco fica no volume Docker `lightning-viewer_postgres_data`. Não execute
 `docker compose down -v` em produção, pois a opção `-v` remove os dados.
 
+### Nginx e HTTPS
+
+Com os certificados do domínio já emitidos pelo Certbot, instale a configuração:
+
+```bash
+sudo cp deploy/nginx/lightning-viewer.conf \
+  /etc/nginx/sites-available/lightning-viewer
+sudo ln -s /etc/nginx/sites-available/lightning-viewer \
+  /etc/nginx/sites-enabled/lightning-viewer
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+O Nginx recebe HTTPS em `443` e encaminha para a aplicação em
+`127.0.0.1:2080`. A porta `2080` não precisa ser liberada no firewall.
+

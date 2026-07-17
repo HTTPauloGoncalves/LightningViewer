@@ -32,6 +32,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       DOTNET_EnableDiagnostics: "0"
       HttpsRedirection__Enabled: "false"
       ConnectionStrings__DefaultConnection: >-
@@ -41,7 +42,7 @@ services:
       EumetSat__RetentionHours: ${EUMETSAT_RETENTION_HOURS:-48}
       Seed__UnidadesCsvPath: /app/data/unidades.csv
     ports:
-      - "2080:8080"
+      - "127.0.0.1:2080:8080"
     volumes:
       - ./data:/app/data:ro
     healthcheck:
