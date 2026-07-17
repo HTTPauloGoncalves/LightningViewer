@@ -1,0 +1,50 @@
+# ==============================================================================
+# .gitignore para ASP.NET Core
+# ==============================================================================
+
+# Binários e arquivos temporários compilados
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+publish/
+*.dll
+*.exe
+*.pdb
+
+# Pastas específicas da IDE (Visual Studio / VS Code / Rider)
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Arquivos de log e testes locais
+logs/
+*.log
+TestResults/
+
+# Arquivos de configuração pessoal (secrets locais)
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# ==============================================================================
+# Arquivos específicos do projeto LightningViewer (Dados não necessários)
+# ==============================================================================
+debug.nc
+DebugDb/
+*.nc
+*.nc4
+
+# Ignorar o SQLite de dev, se você usou localmente antes do Postgres
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Se existir alguma pasta local de armazenamento de downloads do satélite
+/downloads/
+/data/
