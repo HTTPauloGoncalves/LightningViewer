@@ -44,7 +44,8 @@ dbg_*.json
 result.json
 result_filtered.json
 [Dd]ownloads/
-[Dd]ata/
+[Dd]ata/*
+![Dd]ata/unidades.csv
 
 # Operating system files
 .DS_Store
