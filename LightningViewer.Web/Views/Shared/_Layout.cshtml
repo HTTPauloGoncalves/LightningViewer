@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Visualizador de Raios MTG-LI</title>
+    <meta name="description" content="Monitoramento em tempo real de raios via satélite MTG-LI (EUMETSAT) por unidade tomadora de serviço." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    @RenderBody()
+
+    <!-- Leaflet.js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

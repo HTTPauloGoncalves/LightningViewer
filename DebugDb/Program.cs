@@ -1,0 +1,1 @@
+using Npgsql; using System; class Program { static void Main() { var conn = new NpgsqlConnection("Host=localhost;Database=lightning_viewer;Username=postgres;Password=99197379"); conn.Open(); using var cmd = new NpgsqlCommand("TRUNCATE TABLE processed_files, lightning_flashes", conn); cmd.ExecuteNonQuery(); } }

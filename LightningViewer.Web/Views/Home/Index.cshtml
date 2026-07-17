@@ -1,0 +1,181 @@
+@model LightningViewer.Web.Models.ViewModels.MapViewModel
+@{
+    ViewData["Title"] = "Monitor de Raios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<header class="app-header">
+    <div class="header-brand">
+        <span class="header-icon">⚡</span>
+        <div>
+            <span class="header-title">Monitor de Raios MTG-LI</span>
+            <span class="header-subtitle">EUMETSAT · Tempo Real</span>
+        </div>
+    </div>
+
+    <div class="header-status">
+        <div class="status-item">
+            <span class="status-label">Hora Local</span>
+            <span class="status-value mono" id="clock-local">--:--:--</span>
+        </div>
+
+        <div class="update-badge" id="update-badge">
+            <span class="update-dot"></span>
+            <span id="update-label">Aguardando...</span>
+        </div>
+    </div>
+</header>
+
+<!-- Unit Selector Sidebar -->
+<aside class="sidebar glass">
+    <div class="sidebar-section">
+        <label class="field-label">Unidade Tomadora</label>
+        <div class="select-wrapper">
+            <input type="text" id="unit-search" class="unit-search" placeholder="Buscar unidade..." autocomplete="off" />
+            <div id="unit-dropdown" class="unit-dropdown hidden"></div>
+        </div>
+        <div id="unit-info" class="unit-info hidden">
+            <div class="unit-info-name" id="unit-info-name"></div>
+            <div class="unit-info-location" id="unit-info-location"></div>
+            <div class="unit-info-coords" id="unit-info-coords"></div>
+        </div>
+    </div>
+
+
+
+    <div class="sidebar-section">
+        <label class="field-label">Legenda de Raios</label>
+        <div class="legend">
+            <div class="legend-row"><span class="legend-dot" style="background:#ffe066"></span><span>30 km</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#ffa040"></span><span>50 km</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#ff6030"></span><span>100 km</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#cc2040"></span><span>200 km</span></div>
+        </div>
+
+    </div>
+
+
+</aside>
+
+<!-- Geolocation Prompt Modal -->
+<div id="geo-modal" class="geo-modal glass hidden">
+    <div class="geo-modal-content">
+        <h3>📍 Localização</h3>
+        <p>Você quer focar na unidade tomadora de serviço mais próxima à você?</p>
+        <div class="geo-modal-actions">
+            <button id="btn-geo-no" class="btn-secondary">Não, ver América do Sul</button>
+            <button id="btn-geo-yes" class="btn-primary">Sim, buscar a mais próxima</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.geo-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 15, 30, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(8px);
+}
+.geo-modal.hidden {
+    display: none;
+}
+.geo-modal-content {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    color: var(--text-main);
+}
+.geo-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+    color: var(--accent);
+}
+.geo-modal-content p {
+    margin-bottom: 25px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+.geo-modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+.geo-modal-actions button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+.btn-primary:hover {
+    background: #ff7050;
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+</style>
+
+<!-- Map Container -->
+<main class="map-container">
+    <div id="map"></div>
+</main>
+
+<!-- Player Bar -->
+<div class="player-bar glass">
+    <div class="player-controls">
+        <button class="player-btn" id="btn-prev" title="Frame anterior">⏮</button>
+        <button class="player-btn player-btn-main" id="btn-play" title="Play / Pause">
+            <span id="play-icon">▶</span>
+        </button>
+        <button class="player-btn" id="btn-next" title="Próximo frame">⏭</button>
+    </div>
+
+    <div class="player-speed">
+        <button class="speed-btn" id="btn-slower" title="Reduzir velocidade">−</button>
+        <span class="speed-label" id="speed-label">1×</span>
+        <button class="speed-btn" id="btn-faster" title="Aumentar velocidade">+</button>
+    </div>
+
+    <div class="player-timeline">
+        <span class="timeline-start" id="timeline-start">−3h</span>
+        <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="0" value="0" />
+        <span class="timeline-end" id="timeline-end">Agora</span>
+    </div>
+
+    <div class="player-time">
+        <span class="time-label">Exibindo</span>
+        <span class="time-value mono" id="player-time-display">--:--</span>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Pass server-side data to JavaScript
+    window.APP_CONFIG = {
+        unidades: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Unidades, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase })),
+        defaultUnidadeId: @(Model.DefaultUnidade?.Id.ToString() ?? "null")
+    };
+</script>
+<script src="~/js/map.js" asp-append-version="true"></script>
+<script src="~/js/player.js" asp-append-version="true"></script>
+}
